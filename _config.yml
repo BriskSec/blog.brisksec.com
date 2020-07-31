@@ -86,13 +86,6 @@ bing_site_verification   :
 yandex_site_verification :
 naver_site_verification  :
 
-webmaster_verifications:
-  google: 1234
-  bing: 1234
-  alexa: 1234
-  yandex: 1234
-  baidu: 1234
-
 # Social Sharing
 twitter:
   username               : BriskSec
