@@ -14,7 +14,7 @@
           : !$(".author__urls-wrapper button").is(":visible");
       if (show) {
         // fix
-        //$(".sidebar").addClass("sticky");
+        // $(".sidebar").addClass("sticky");
       } else {
         // unfix
         $(".sidebar").removeClass("sticky");
