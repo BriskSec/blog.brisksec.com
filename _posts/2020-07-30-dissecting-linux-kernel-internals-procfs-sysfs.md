@@ -10,7 +10,7 @@ tags:
 image: /assets/images/linux_xray.jpg
 ---
 
-Understanding the internals of the Linux Kernel isn't easy. In this series of posts, I'm looking at different aspects of the Linux Kernel, starting from less complicated areas, to understand Linux Kernel a little better. During this effort, I pay special attention to the security aspect and highlight areas that might be important for security research and testing.
+In this series of posts, I'm looking at different aspects of the Linux Kernel, starting from less complicated areas, to understand Linux Kernel a little better. During this effort, I pay special attention to the security aspect and highlight areas that might be important for security research and testing.
 
 In this post, we look at the history, usage, internals and implementation details of `procfs` which is responsible for the `/proc` mount and `sysfs` which is responsible for `/sys`. 
 
