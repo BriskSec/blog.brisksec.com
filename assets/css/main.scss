@@ -116,3 +116,34 @@ a[href*="//"]:not([href*="mysite.com"]) {
 .site-logo img {
     max-height: 3rem;
 }
+
+.tag-box {
+    text-align: center;
+    line-height: 1em;
+}
+
+.tag-box-tag {
+    font-size: small;
+    margin-right: 10px;
+    white-space: nowrap;
+}
+
+.profile_sidebar_item_title {
+    text-align: center;
+    border-bottom: 1px black solid;
+}
+
+.tag-box-list-item {
+    font-size: small;
+    padding: 0px;
+    margin-bottom: 5px;
+    padding-bottom: 5px;
+    margin-top: 5px;
+    line-height: 1em;
+    border-bottom: 1px black dotted;
+    text-align: left;
+}
+
+.tag-box-list-item a {
+    text-decoration: none;
+}
