@@ -1,5 +1,5 @@
 ---
-title: Dissect Linux Kernel Internals - procfs (/proc) and sysfs (/sys)
+title: Dissecting Linux Kernel Internals - procfs (/proc) and sysfs (/sys)
 author: ayoma
 categories:
   - Dissect
@@ -17,19 +17,19 @@ In this post, we look at the history, usage, internals and implementation detail
 
 # procfs (/proc)
 
-The `/proc` mount is part of [procfs](https://man7.org/linux/man-pages/man5/procfs.5.html), a special in-memory Virtual File System (VFS) used to present (and modify) process information, kernel processes, and other system information in a hierarchical file-like structure. This layer is expected to provide convenient access to the said information, acting as an interface to internal data structures in the kernel. 
+The `/proc` mount is part of [procfs](https://man7.org/linux/man-pages/man5/procfs.5.html){:target="_blank"}, a special in-memory Virtual File System (VFS) used to present (and modify) process information, kernel processes, and other system information in a hierarchical file-like structure. This layer is expected to provide convenient access to the said information, acting as an interface to internal data structures in the kernel. 
 
 >  The proc filesystem is a pseudo-filesystem which provides an interface to kernel data structures.  It is commonly mounted at /proc.  Typically, it is mounted automatically by the system, but it can also be mounted manually using a command such as: mount -t proc proc /proc
 >
 > Most of the files in the proc filesystem are read-only, but some files are writable, allowing kernel variables to be changed.
 > 
-> Source: <https://man7.org/linux/man-pages/man5/procfs.5.html>
+> Source: <https://man7.org/linux/man-pages/man5/procfs.5.html>{:target="_blank"}
 
 I will not go into details about the contents and structure of `/proc`. This is well described in the following pages: 
 
-- <https://www.thegeekdiary.com/understanding-the-proc-file-system/>
-- <https://en.wikipedia.org/wiki/Procfs#Linux>
-- <http://www.noah.org/wiki//proc>
+- <https://www.thegeekdiary.com/understanding-the-proc-file-system/>{:target="_blank"}
+- <https://en.wikipedia.org/wiki/Procfs#Linux>{:target="_blank"}
+- <http://www.noah.org/wiki//proc>{:target="_blank"}
 
 However, following are worth mentioning since I have found these highly useful during security research/testing:
 
@@ -38,14 +38,14 @@ However, following are worth mentioning since I have found these highly useful d
 - `/proc/PID/environ`: a file containing the names and contents of the environment variables that affect the process
   - Read confidential information passed in as environment variables (specially useful in containerized environments, since this is a common practice)
 - `/proc/PID/mem`: a binary image representing the process's virtual memory, can only be accessed by a ptrace'ing process 
-  - Useful in  [dumping process memory](https://shafiqvinales.wordpress.com/2017/09/14/dump-a-linux-processs-memory-to-file/), but with [limitations](https://stackoverflow.com/a/12980874)
+  - Useful in  [dumping process memory](https://shafiqvinales.wordpress.com/2017/09/14/dump-a-linux-processs-memory-to-file/){:target="_blank"}, but with [limitations](https://stackoverflow.com/a/12980874){:target="_blank"}
 - `/proc/PID/maps`: the memory map showing which addresses currently visible to that process are mapped to which regions in RAM or to files
   - Useful in binary exploitation (offset calculations, etc.)
 - `/proc/cpuinfo`: containing information about the CPU
   - Identifying CPU architecture. Useful in binary exploitations to create matching payloads.
 - `/proc/version`: containing the Linux kernel version, distribution number, gcc version number used to build the kernel and any other pertinent information relating to the version of the kernel currently running
   - Identifying operating system related information architecture. Useful in binary exploitations to create matching payloads.
-- `/proc/net/`: a directory containing useful information about the network stack, in particular /proc/net/nf_conntrack, which lists existing network connections
+- `/proc/net/`: a directory containing useful information about the network stack, in particular `/proc/net/nf_conntrack`, which lists existing network connections
   - Get information about network stack and connections.
 - `/proc/modules`: containing a list of the kernel modules currently loaded . It gives some indication (not always entirely correct) of dependencies. 
   - Useful in binary exploitations to create matching payloads.
@@ -59,40 +59,40 @@ However, following are worth mentioning since I have found these highly useful d
  I will keep this lists updated, if I come across any additional important security usages in future.
 
  If you are even further keen about how `procfs` works, you can refer to the following documents and the implementation details below:
- - <https://www.kernel.org/doc/Documentation/filesystems/proc.txt>
+ - <https://www.kernel.org/doc/Documentation/filesystems/proc.txt>{:target="_blank"}
 
 ## Implementation Details
 
-`procfs` is just another Virtual Filesystem (VFS) from the Kernel's point of view. Therefore, Kernel can treat it similar to how it treats any file system. It is not my intention to discuss how VFS works in this post. The article "[Virtual filesystems in Linux: Why we need them and how they work](https://opensource.com/article/19/3/virtual-filesystems-linux)" further discuss about how userspace accesses is provided for various types of filesystems commonly mounted on Linux systems. 
+`procfs` is just another Virtual Filesystem (VFS) from the Kernel's point of view. Therefore, Kernel can treat it similar to how it treats any file system. It is not my intention to discuss how VFS works in this post. The article "[Virtual filesystems in Linux: Why we need them and how they work](https://opensource.com/article/19/3/virtual-filesystems-linux){:target="_blank"}" further discuss about how userspace accesses is provided for various types of filesystems commonly mounted on Linux systems. 
 
 ![VFS](https://opensource.com/sites/default/files/uploads/virtualfilesystems_2-shim-layer.png)
-> Source: <https://opensource.com/article/19/3/virtual-filesystems-linux>
+> Source: <https://opensource.com/article/19/3/virtual-filesystems-linux>{:target="_blank"}
 
-As explained in, [Overview of the Linux Virtual File System](https://www.kernel.org/doc/html/latest/filesystems/vfs.html) in order to expose a VFS, it's required to first register it using `register_filesystem` or `linux/fs.h`. The function `proc_root_init(void)` of `/fs/proc/root.c` does this [[ref]](https://elixir.bootlin.com/linux/v5.8-rc4/source/fs/proc/root.c#L308). Also, notice the name of the root inode of `/proc` tree at `proc_root` struct of `/fs/proc/root.c` [[ref]](https://elixir.bootlin.com/linux/v5.8-rc4/source/fs/proc/root.c#L371).
+As explained in, [Overview of the Linux Virtual File System](https://www.kernel.org/doc/html/latest/filesystems/vfs.html){:target="_blank"} in order to expose a VFS, it's required to first register it using `register_filesystem` or `linux/fs.h`. The function `proc_root_init(void)` of `/fs/proc/root.c` does this [[ref]](https://elixir.bootlin.com/linux/v5.8-rc4/source/fs/proc/root.c#L308){:target="_blank"}. Also, notice the name of the root inode of `/proc` tree at `proc_root` struct of `/fs/proc/root.c` [[ref]](https://elixir.bootlin.com/linux/v5.8-rc4/source/fs/proc/root.c#L371){:target="_blank"}.
 
 Now let's briefly look at how `/proc/cpuinfo` is implemented:
 
-- [fs/proc/cpuinfo.c](https://elixir.bootlin.com/linux/v5.8-rc4/source/fs/proc/cpuinfo.c) contains relevant source file. The last line of this file is an invocation of `fs_initcall`.
-- The `initcall` mechanism of the Kernel is further described in [0xax's - Linux Inside - GitBook](https://0xax.gitbooks.io/linux-insides/content/Concepts/linux-cpu-3.html). `do_initcalls(void)` of `init/main.c` is where each `initcall` level is executed [[ref]](https://elixir.bootlin.com/linux/v5.8-rc4/source/init/main.c#L1275). `fs_initcall` is part of this process [[ref]](https://elixir.bootlin.com/linux/v5.8-rc4/source/init/main.c#L1249).
-- During the `fs_initcall`, `proc_cpuinfo_init` of [fs/proc/cpuinfo.c](https://elixir.bootlin.com/linux/v5.8-rc4/source/fs/proc/cpuinfo.c) is executed.
+- [fs/proc/cpuinfo.c](https://elixir.bootlin.com/linux/v5.8-rc4/source/fs/proc/cpuinfo.c){:target="_blank"} contains relevant source file. The last line of this file is an invocation of `fs_initcall`.
+- The `initcall` mechanism of the Kernel is further described in [0xax's - Linux Inside - GitBook](https://0xax.gitbooks.io/linux-insides/content/Concepts/linux-cpu-3.html){:target="_blank"}. `do_initcalls(void)` of `init/main.c` is where each `initcall` level is executed [[ref]](https://elixir.bootlin.com/linux/v5.8-rc4/source/init/main.c#L1275){:target="_blank"}. `fs_initcall` is part of this process [[ref]](https://elixir.bootlin.com/linux/v5.8-rc4/source/init/main.c#L1249){:target="_blank"}.
+- During the `fs_initcall`, `proc_cpuinfo_init` of [fs/proc/cpuinfo.c](https://elixir.bootlin.com/linux/v5.8-rc4/source/fs/proc/cpuinfo.c){:target="_blank"} is executed.
 - `proc_create(-)` of `fs/proc/generic.c` is called from `proc_cpuinfo_init`. 
-- `proc_ops` defined at [[ref]](https://elixir.bootlin.com/linux/v5.8-rc4/source/fs/proc/cpuinfo.c#L19) is set to `proc_dir_entry` at [[ref]](https://elixir.bootlin.com/linux/v5.8-rc4/source/fs/proc/generic.c#L558).
-- Said `proc_ops`, defines `proc_open` to point to `cpuinfo_open` [[ref]](https://elixir.bootlin.com/linux/v5.8-rc4/source/fs/proc/cpuinfo.c#L21).
-- `cpuinfo_op` referenced in `cpuinfo_open` is defined in each CPU architecture supported by the Kernel. If we consider x86 as the example, `/arch/x86/kernel/cpu/proc.c` defines this [[ref]](https://elixir.bootlin.com/linux/v5.8-rc4/source/arch/x86/kernel/cpu/proc.c#L177).
-- `cpuinfo_op` ultimately uses `show_cpuinfo` to show CPU information [[ref]](https://elixir.bootlin.com/linux/v5.8-rc4/source/arch/x86/kernel/cpu/proc.c#L61). 
+- `proc_ops` defined at [[ref]](https://elixir.bootlin.com/linux/v5.8-rc4/source/fs/proc/cpuinfo.c#L19) is set to `proc_dir_entry` at [[ref]](https://elixir.bootlin.com/linux/v5.8-rc4/source/fs/proc/generic.c#L558){:target="_blank"}.
+- Said `proc_ops`, defines `proc_open` to point to `cpuinfo_open` [[ref]](https://elixir.bootlin.com/linux/v5.8-rc4/source/fs/proc/cpuinfo.c#L21){:target="_blank"}.
+- `cpuinfo_op` referenced in `cpuinfo_open` is defined in each CPU architecture supported by the Kernel. If we consider x86 as the example, `/arch/x86/kernel/cpu/proc.c` defines this [[ref]](https://elixir.bootlin.com/linux/v5.8-rc4/source/arch/x86/kernel/cpu/proc.c#L177){:target="_blank"}.
+- `cpuinfo_op` ultimately uses `show_cpuinfo` to show CPU information [[ref]](https://elixir.bootlin.com/linux/v5.8-rc4/source/arch/x86/kernel/cpu/proc.c#L61){:target="_blank"}. 
 
 It's true that this is not the complete end-to-end flow, such detailed explanation is not the focus of this post. However, if you are interested in further details, I believe now you have good amount of pointers regarding where to look at. 
 
 Following are list of interesting references that further discuss internals of `procfs`:
 
-- [How does /proc/* work?](https://superuser.com/a/619961)
-- [Minimal runnable example of creating a new procfs entry](https://superuser.com/a/1442571)
-- [proc_create() example for kernel module](https://stackoverflow.com/a/18924359)
-- [The Linux /proc Filesystem as a Programmers' Tool](https://www.linuxjournal.com/article/8381)
+- [How does /proc/* work?](https://superuser.com/a/619961){:target="_blank"}
+- [Minimal runnable example of creating a new procfs entry](https://superuser.com/a/1442571){:target="_blank"}
+- [proc_create() example for kernel module](https://stackoverflow.com/a/18924359){:target="_blank"}
+- [The Linux /proc Filesystem as a Programmers' Tool](https://www.linuxjournal.com/article/8381){:target="_blank"}
 
 ## procfs in action
 
-We can use [strace](https://man7.org/linux/man-pages/man1/strace.1.html) to observe how procfs is used in different process related commands. `sudo strace ps` whuld result in the following trace:
+We can use [strace](https://man7.org/linux/man-pages/man1/strace.1.html){:target="_blank"} to observe how procfs is used in different process related commands. `sudo strace ps` whuld result in the following trace:
 
 ```bash
 $ sudo strace ps
@@ -168,12 +168,12 @@ exit_group(0)                           = ?
 
 Following are the highlights from the output: 
 
-- [openat](https://linux.die.net/man/2/openat) is used to open the folder `/proc`
-- [getdents64](https://linux.die.net/man/2/getdents64) is used to read the contents of the directory (which is then used to enumerate over directories found)
-- Use [openat](https://linux.die.net/man/2/openat) to read contents of "/proc/PID/stat" and "/proc/PID/status". 
+- [openat](https://linux.die.net/man/2/openat){:target="_blank"} is used to open the folder `/proc`
+- [getdents64](https://linux.die.net/man/2/getdents64){:target="_blank"} is used to read the contents of the directory (which is then used to enumerate over directories found)
+- Use [openat](https://linux.die.net/man/2/openat){:target="_blank"} to read contents of "/proc/PID/stat" and "/proc/PID/status". 
 - Use `write` to print extracted data to the screen (`/dev/pts/0` - which is the pseudo-terminal I'm connected to)
 
-Usage of VFS in `procfs` can be observed also by using `trace-bpfcc`. Install BCC as instructed in [INSTALL.md](https://github.com/iovisor/bcc/blob/master/INSTALL.md) and run the following command to trace any invocations made to `show_cpuinfo`. In a separate terminal run command `cat /proc/spuinfo`: 
+Usage of VFS in `procfs` can be observed also by using `trace-bpfcc`. Install BCC as instructed in [INSTALL.md](https://github.com/iovisor/bcc/blob/master/INSTALL.md){:target="_blank"} and run the following command to trace any invocations made to `show_cpuinfo`. In a separate terminal run command `cat /proc/spuinfo`: 
 
 ```bash
 $ sudo trace-bpfcc -K -U -I /usr/src/linux-headers-5.4.0-42/include/linux/proc_fs.h 'p::show_cpuinfo(struct seq_file *m, void *v) "CPU-Info Called"'
@@ -213,44 +213,43 @@ TIME         READ/s  WRITE/s  FSYNC/s   OPEN/s CREATE/s
 03:57:19:        17       10        0        0        0
 ```
 
-[Virtual filesystems in Linux: Why we need them and how they work](https://opensource.com/article/19/3/virtual-filesystems-linux) discuss how you can utilize `trace-bpfcc` to observe `sysfs` (which we discuss next) and identify USB stick insertions. 
+[Virtual filesystems in Linux: Why we need them and how they work](https://opensource.com/article/19/3/virtual-filesystems-linux){:target="_blank"} discuss how you can utilize `trace-bpfcc` to observe `sysfs` (which we discuss next) and identify USB stick insertions. 
 
 # sysfs (/sys)
 
-Eventually `/proc` got clustered with non-process related information, especially with device & driver information. In order to make sure every device-driver adhere to a common structure and to make `/proc` less cluttered  `/sys` ([sysfs](https://man7.org/linux/man-pages/man5/sysfs.5.html)) was introduced from Kernel 2.6 and above.   
+Eventually `/proc` got clustered with non-process related information, especially with device & driver information. In order to make sure every device-driver adhere to a common structure and to make `/proc` less cluttered  `/sys` ([sysfs](https://man7.org/linux/man-pages/man5/sysfs.5.html){:target="_blank"}) was introduced from Kernel 2.6 and above.   
 
 `sysfs` is actually intended to simplify `procfs` by moving most of the hardware information out of `procfs`. For example, `sysfs` is used by `udev` to access device and device driver information
 
 If you are interested, please read the response to the following unix-stackexchange answer to understand the difference and historical reasons for having these filesystems. 
 
-- [What is the difference between procfs and sysfs?](https://unix.stackexchange.com/a/86614)
+- [What is the difference between procfs and sysfs?](https://unix.stackexchange.com/a/86614){:target="_blank"}
 
-`sysfs` expose the readable and writable properties of what the kernel calls [kobjects](https://www.kernel.org/doc/Documentation/kobject.txt) to userspace. 
+`sysfs` expose the readable and writable properties of what the kernel calls [kobjects](https://www.kernel.org/doc/Documentation/kobject.txt){:target="_blank"} to userspace. 
 
 > When you see a sysfs directory full of other directories, generally each of those directories corresponds to a kobject in the same kset.
-> <https://www.kernel.org/doc/Documentation/kobject.txt>
+> <https://www.kernel.org/doc/Documentation/kobject.txt>{:target="_blank"}
 
 Following references will help you understand further details:
 
-- [Sysfs and kobjects - https://www.win.tue.nl/~aeb/linux/lk/lk-13.html](https://www.win.tue.nl/~aeb/linux/lk/lk-13.html)
+- [Sysfs and kobjects - https://www.win.tue.nl/~aeb/linux/lk/lk-13.html](https://www.win.tue.nl/~aeb/linux/lk/lk-13.html){:target="_blank"}
 
 # Era before procfs (and sysfs)
 
 Following links point to papers on "The Process File System and Process Model in UNIX System V" / "Process ad Files", which are the initiation points of `procfs`: 
 
-- [What is the difference between procfs and sysfs?](https://unix.stackexchange.com/a/86614)
-- <https://news.ycombinator.com/item?id=21532985>
-- Paper on "Process as Files", suggesting  `/proc/nnnnn` for each process, corresponding to its address space, allowing inspection and modification of each process' image: <http://lucasvr.gobolinux.org/etc/Killian84-Procfs-USENIX.pdf>
+- [What is the difference between procfs and sysfs?](https://unix.stackexchange.com/a/86614){:target="_blank"}
+- <https://news.ycombinator.com/item?id=21532985>{:target="_blank"}
+- Paper on "Process as Files", suggesting  `/proc/nnnnn` for each process, corresponding to its address space, allowing inspection and modification of each process' image: <http://lucasvr.gobolinux.org/etc/Killian84-Procfs-USENIX.pdf>{:target="_blank"}
   - Also  mentions "We have written a version of ps(1) which is about four times faster than the standard one". More about that below.
-- Paper on "The Process File System and Process Model in UNIX System V": <https://www.usenix.org/sites/default/files/usenix_winter91_faulkner.pdf>
+- Paper on "The Process File System and Process Model in UNIX System V": <https://www.usenix.org/sites/default/files/usenix_winter91_faulkner.pdf>{:target="_blank"}
   - This paper discusses about improving `/proc` from just being a replacement to `ptrace` syscall, to being a general interface to UNIX process model abstraction. 
 
 ![Process as Files](/assets/images/2020-08-01-dissecting-docker-internals-part-1-linux-kernel-namespaces/2020-08-01-22-21-29.png)
+> Source: <http://lucasvr.gobolinux.org/etc/Killian84-Procfs-USENIX.pdf>{:target="_blank"}
 
-Before `procfs`, debugging a process was done by going through `/dev/kmem` and/or `/dev/mem` with help of syscall (ptrace)[https://man7.org/linux/man-pages/man2/ptrace.2.html]. This required extensive knowledge of Kernel data structures since the person who is debugging should calculate the locations to read precisely to capture certain information. Even though tools like `ps` use `/proc` now [ref](https://gitlab.com/procps-ng/procps/-/blob/v3.3.16/contrib/minimal.c#L326), those used to go through `/dev/mem` before existence of `procfs` (such operations also required root-access).
-
-http://www.secretmango.com/jimb/Whitepapers/ptrace/ptrace.html
+Before `procfs`, debugging a process was done by going through `/dev/kmem` and/or `/dev/mem` with help of syscall [ptrace](https://man7.org/linux/man-pages/man2/ptrace.2.html){:target="_blank"}. This required extensive knowledge of Kernel data structures since the person who is debugging should calculate the locations to read precisely to capture certain information. Even though tools like `ps` use `/proc` now [[ref]](https://gitlab.com/procps-ng/procps/-/blob/v3.3.16/contrib/minimal.c#L326){:target="_blank"}, those used to go through `/dev/mem` before existence of `procfs` (such operations also required root-access).
 
 # What about MacOS?
 
-MacOS doesn't have procfs (`/proc`) or sysfs (`/sys`). All such access to process or Kernel information is done through other interfaces to the Linux Kernel such as [sysctl](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man3/sysctl.3.html) ([sysctl command](https://ss64.com/osx/sysctl.html)). An excellent post talking about attempting to port procfs to MacOS is available at <http://web.archive.org/web/20200103161748/http://osxbook.com/book/bonus/ancient/procfs/>.
+MacOS doesn't have procfs (`/proc`) or sysfs (`/sys`). All such access to process or Kernel information is done through other interfaces to the Linux Kernel such as [sysctl](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man3/sysctl.3.html){:target="_blank"} ([sysctl command](https://ss64.com/osx/sysctl.html){:target="_blank"}). An excellent post talking about attempting to port procfs to MacOS is available at <http://web.archive.org/web/20200103161748/http://osxbook.com/book/bonus/ancient/procfs/>{:target="_blank"}.
