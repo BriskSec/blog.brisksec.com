@@ -73,13 +73,31 @@ As explained in, [Overview of the Linux Virtual File System](https://www.kernel.
 Now let's briefly look at how `/proc/cpuinfo` is implemented:
 
 - [fs/proc/cpuinfo.c](https://elixir.bootlin.com/linux/v5.8-rc4/source/fs/proc/cpuinfo.c){:target="_blank"} contains relevant source file. The last line of this file is an invocation of `fs_initcall`.
+
+![](/assets/images/2020-07-30-dissecting-linux-kernel-internals-procfs-sysfs/2020-08-04-09-53-42.png)
+
 - The `initcall` mechanism of the Kernel is further described in [0xax's - Linux Inside - GitBook](https://0xax.gitbooks.io/linux-insides/content/Concepts/linux-cpu-3.html){:target="_blank"}. `do_initcalls(void)` of `init/main.c` is where each `initcall` level is executed [[ref]](https://elixir.bootlin.com/linux/v5.8-rc4/source/init/main.c#L1275){:target="_blank"}. `fs_initcall` is part of this process [[ref]](https://elixir.bootlin.com/linux/v5.8-rc4/source/init/main.c#L1249){:target="_blank"}.
+
+![](/assets/images/2020-07-30-dissecting-linux-kernel-internals-procfs-sysfs/2020-08-04-09-57-01.png)
+
+![](/assets/images/2020-07-30-dissecting-linux-kernel-internals-procfs-sysfs/2020-08-04-09-57-21.png)
+
 - During the `fs_initcall`, `proc_cpuinfo_init` of [fs/proc/cpuinfo.c](https://elixir.bootlin.com/linux/v5.8-rc4/source/fs/proc/cpuinfo.c){:target="_blank"} is executed.
 - `proc_create(-)` of `fs/proc/generic.c` is called from `proc_cpuinfo_init`. 
 - `proc_ops` defined at [[ref]](https://elixir.bootlin.com/linux/v5.8-rc4/source/fs/proc/cpuinfo.c#L19) is set to `proc_dir_entry` at [[ref]](https://elixir.bootlin.com/linux/v5.8-rc4/source/fs/proc/generic.c#L558){:target="_blank"}.
 - Said `proc_ops`, defines `proc_open` to point to `cpuinfo_open` [[ref]](https://elixir.bootlin.com/linux/v5.8-rc4/source/fs/proc/cpuinfo.c#L21){:target="_blank"}.
+
+![](/assets/images/2020-07-30-dissecting-linux-kernel-internals-procfs-sysfs/2020-08-04-09-58-38.png)
+
 - `cpuinfo_op` referenced in `cpuinfo_open` is defined in each CPU architecture supported by the Kernel. If we consider x86 as the example, `/arch/x86/kernel/cpu/proc.c` defines this [[ref]](https://elixir.bootlin.com/linux/v5.8-rc4/source/arch/x86/kernel/cpu/proc.c#L177){:target="_blank"}.
+
+![](/assets/images/2020-07-30-dissecting-linux-kernel-internals-procfs-sysfs/2020-08-04-09-59-56.png)
+
+![](/assets/images/2020-07-30-dissecting-linux-kernel-internals-procfs-sysfs/2020-08-04-10-04-00.png)
+
 - `cpuinfo_op` ultimately uses `show_cpuinfo` to show CPU information [[ref]](https://elixir.bootlin.com/linux/v5.8-rc4/source/arch/x86/kernel/cpu/proc.c#L61){:target="_blank"}. 
+
+![](/assets/images/2020-07-30-dissecting-linux-kernel-internals-procfs-sysfs/2020-08-04-10-00-20.png)
 
 It's true that this is not the complete end-to-end flow, such detailed explanation is not the focus of this post. However, if you are interested in further details, I believe now you have good amount of pointers regarding where to look at. 
 
@@ -245,11 +263,15 @@ Following links point to papers on "The Process File System and Process Model in
 - Paper on "The Process File System and Process Model in UNIX System V": <https://www.usenix.org/sites/default/files/usenix_winter91_faulkner.pdf>{:target="_blank"}
   - This paper discusses about improving `/proc` from just being a replacement to `ptrace` syscall, to being a general interface to UNIX process model abstraction. 
 
-![Process as Files](/assets/images/2020-08-01-dissecting-docker-internals-part-1-linux-kernel-namespaces/2020-08-01-22-21-29.png)
+![Process as Files](/assets/images/2020-07-30-dissecting-linux-kernel-internals-procfs-sysfs/2020-08-01-22-21-29.png)
 > Source: <http://lucasvr.gobolinux.org/etc/Killian84-Procfs-USENIX.pdf>{:target="_blank"}
 
 Before `procfs`, debugging a process was done by going through `/dev/kmem` and/or `/dev/mem` with help of syscall [ptrace](https://man7.org/linux/man-pages/man2/ptrace.2.html){:target="_blank"}. This required extensive knowledge of Kernel data structures since the person who is debugging should calculate the locations to read precisely to capture certain information. Even though tools like `ps` use `/proc` now [[ref]](https://gitlab.com/procps-ng/procps/-/blob/v3.3.16/contrib/minimal.c#L326){:target="_blank"}, those used to go through `/dev/mem` before existence of `procfs` (such operations also required root-access).
 
 # What about MacOS?
 
-MacOS doesn't have procfs (`/proc`) or sysfs (`/sys`). All such access to process or Kernel information is done through other interfaces to the Linux Kernel such as [sysctl](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man3/sysctl.3.html){:target="_blank"} ([sysctl command](https://ss64.com/osx/sysctl.html){:target="_blank"}). An excellent post talking about attempting to port procfs to MacOS is available at <http://web.archive.org/web/20200103161748/http://osxbook.com/book/bonus/ancient/procfs/>{:target="_blank"}.
+MacOS doesn't have procfs (`/proc`) or sysfs (`/sys`). 
+
+![](/assets/images/2020-07-30-dissecting-linux-kernel-internals-procfs-sysfs/2020-08-01-17-59-05.png)
+
+All such access to process or Kernel information is done through other interfaces to the Linux Kernel such as [sysctl](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man3/sysctl.3.html){:target="_blank"} ([sysctl command](https://ss64.com/osx/sysctl.html){:target="_blank"}). An excellent post talking about attempting to port procfs to MacOS is available at <http://web.archive.org/web/20200103161748/http://osxbook.com/book/bonus/ancient/procfs/>{:target="_blank"}.
