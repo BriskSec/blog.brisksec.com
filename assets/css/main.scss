@@ -1,0 +1,149 @@
+---
+# Only the main Sass file needs front matter (the dashes are enough)
+---
+
+@charset "utf-8";
+
+$right-sidebar-width-narrow: 150px !default;
+$right-sidebar-width: 230px !default;
+$right-sidebar-width-wide: 280px !default;
+
+/* system typefaces */
+$serif: Georgia, Times, serif !default;
+$sans-serif: -apple-system, BlinkMacSystemFont, "Open Sans", "Roboto", "Segoe UI",
+  "Helvetica Neue", "Lucida Grande", Arial, sans-serif !default;
+$monospace: Monaco, Consolas, "Lucida Console", monospace !default;
+
+/* sans serif typefaces */
+$sans-serif-narrow: $sans-serif !default;
+$helvetica: Helvetica, "Helvetica Neue", Arial, sans-serif !default;
+
+/* serif typefaces */
+$georgia: Georgia, serif !default;
+$times: Times, serif !default;
+$bodoni: "Bodoni MT", serif !default;
+$calisto: "Calisto MT", serif !default;
+$garamond: Garamond, serif !default;
+
+$global-font-family: $sans-serif !default;
+$header-font-family: $sans-serif !default;
+$caption-font-family: $sans-serif !default;
+
+@import "minimal-mistakes/skins/_{{ site.minimal_mistakes_skin | default: 'default' }}"; // skin
+@import "minimal-mistakes"; // main partials
+@import url('https://fonts.googleapis.com/css?family=Merriweather&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Russo+One&display=swap');
+
+.page__content {
+  font-size: 0.9em;
+}
+
+.author__bio_small {
+  font-size: small !important;
+}
+
+.author__avatar, .author__content, .author__urls-wrapper {
+  text-align: center !important;
+}
+
+.profile_sidebar_item {
+  background-color: #d6d6d6;
+  padding: 6px;
+  border-radius: 6px;
+  border-color: #343434;
+  border-width: 2px;
+  border-style: dotted;
+}
+
+a[href*="//"]:not([href*="mysite.com"]) {
+    /* external link styles, use :before or :after if you want! */
+}
+
+#site-nav .masthead__menu-item {
+  background-color: #fff6e1;
+  padding: 6px;
+  border-radius: 3px;
+  border-color: #938d6e;
+  border-width: 3px;
+  border-style: solid;
+  font-size: 0.8em;
+  margin-left: 5px;
+}
+
+.masthead {
+  //background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAMklEQVQYlWNgYGAwZkAFxjjEcApgSOKTIGgSVpOxKcKqmGiFRFuNUwCHGFaT8erCGuAAtV8HLQ/j6goAAAAASUVORK5CYII=);
+  background-color: #e9dcbe;
+}
+
+.greedy-nav {
+  background-color: transparent !important;
+}
+
+.site-title {
+  font-family: 'Russo One', sans-serif;
+  font-size: 1.7em;
+}
+
+#main {
+  max-width: 1800px !important;
+}
+
+.masthead__inner-wrap {
+  max-width: 1800px !important;
+}
+
+.page__content img:not(.emoji) {
+  border: 3px #9b9b9b solid;
+  box-shadow: 0px 10px 15px 5px #b3b3b3;
+  margin: 0 auto;
+  display: block;
+}
+
+.page__content img:not(.emoji) {
+  @media (min-width: 800px) {
+    max-width: 60%;
+  }
+}
+
+.toc__menu li ul li ul li ul {
+  /* display: none; */
+}
+
+.highlighter-rouge {
+  background-color: #f5d3ad;
+}
+
+.site-logo img {
+    max-height: 3rem;
+}
+
+.tag-box {
+    text-align: center;
+    line-height: 1em;
+}
+
+.tag-box-tag {
+    font-size: small;
+    margin-right: 10px;
+    white-space: nowrap;
+}
+
+.profile_sidebar_item_title {
+    text-align: center;
+    border-bottom: 1px black solid;
+}
+
+.tag-box-list-item {
+    font-size: small;
+    padding: 0px;
+    margin-bottom: 5px;
+    padding-bottom: 5px;
+    margin-top: 5px;
+    line-height: 1em;
+    border-bottom: 1px black dotted;
+    text-align: left;
+}
+
+.tag-box-list-item a {
+    text-decoration: none;
+}

@@ -1,0 +1,23 @@
+brisksec:    
+  name             : "BriskSec"
+  avatar           : "/assets/images/logo.png" # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
+  bio              : ""
+  bio_small        : ""
+  location         : "Sri Lanka"
+  email            :
+  links:
+    - label: "Website"
+      icon: "fas fa-fw fa-link"
+      url: "https://brisksec.com"
+    - label: "LinkedIn"
+      icon: "fab fa-fw fa-linkedin"
+      url: "https://www.linkedin.com/in/BriskSec/"
+    - label: "Twitter"
+      icon: "fab fa-fw fa-twitter-square"
+      url: "https://twitter.com/BriskSec"
+    - label: "Facebook"
+      icon: "fab fa-fw fa-facebook-square"
+      # url: "https://facebook.com/"
+    - label: "GitHub"
+      icon: "fab fa-fw fa-github"
+      url: "https://github.com/BriskSec"
